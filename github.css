@@ -1,0 +1,334 @@
+/* =====================================================================
+   Réplica en HTML/CSS de la interfaz de GitHub (modo oscuro) para el
+   simulador. Todo es código: no se usan capturas de pantalla.
+   ===================================================================== */
+
+.gh {
+  --gh-bg: #0d1117;
+  --gh-inset: #010409;
+  --gh-muted-bg: #151b23;
+  --gh-btn: #212830;
+  --gh-btn-hover: #262c36;
+  --gh-border: #3d444d;
+  --gh-border-muted: #2a313c;
+  --gh-fg: #f0f6fc;
+  --gh-fg-muted: #9198a1;
+  --gh-accent: #4493f8;
+  --gh-green: #238636;
+  --gh-green-hover: #29903b;
+  --gh-tab: #f78166;
+  --gh-success: #3fb950;
+
+  position: absolute; left: 0; top: 0;
+  display: flex; flex-direction: column;
+  background: var(--gh-bg);
+  color: var(--gh-fg);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
+  font-size: 14px; font-weight: 400; line-height: 1.5;
+  overflow: hidden;
+  container-type: inline-size; container-name: gh;
+  -webkit-font-smoothing: auto;
+  cursor: default;
+}
+.gh * { box-sizing: border-box; }
+.gh svg.oc { width: 16px; height: 16px; fill: currentColor; flex: none; display: inline-block; vertical-align: text-bottom; }
+.gh .muted { color: var(--gh-fg-muted); }
+.gh .bold { font-weight: 600; }
+.gh .link { color: var(--gh-accent); cursor: pointer; }
+.gh .link:hover { text-decoration: underline; }
+.gh .sep { width: 1px; height: 20px; background: var(--gh-border); margin: 0 4px; }
+
+/* ---------- Botones ---------- */
+.gh .btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  height: 32px; padding: 0 12px; border-radius: 6px;
+  background: var(--gh-btn); border: 1px solid var(--gh-border);
+  color: var(--gh-fg); font-size: 14px; font-weight: 500; white-space: nowrap;
+  cursor: pointer; transition: background .08s;
+}
+.gh .btn:hover { background: var(--gh-btn-hover); }
+.gh .btn .oc { color: var(--gh-fg-muted); }
+.gh .btn.sm { height: 28px; padding: 0 8px; font-size: 12px; }
+.gh .btn.icon { width: 32px; padding: 0; }
+.gh .btn.icon.sm { width: 28px; }
+.gh .btn.primary { background: var(--gh-green); border-color: rgba(240,246,252,.1); color: #fff; }
+.gh .btn.primary:hover { background: var(--gh-green-hover); }
+.gh .btn.primary .oc { color: #fff; }
+.gh .btn.ghost { background: transparent; border-color: transparent; }
+.gh .btn.ghost:hover { background: var(--gh-btn-hover); }
+.gh .counter { display: inline-grid; place-items: center; min-width: 20px; height: 18px; padding: 0 6px; border-radius: 9px; background: #2f3742; font-size: 12px; font-weight: 500; color: var(--gh-fg); }
+.gh .label { display: inline-flex; align-items: center; height: 20px; padding: 0 7px; border: 1px solid var(--gh-border); border-radius: 10px; font-size: 12px; font-weight: 500; color: var(--gh-fg-muted); }
+
+.gh .avatar { display: inline-grid; place-items: center; flex: none; border-radius: 50%; background: #1FF0F0; color: #0b3b3b; font-weight: 700; letter-spacing: -.02em; overflow: hidden; }
+.gh .avatar.a32 { width: 32px; height: 32px; font-size: 7px; }
+.gh .avatar.a24 { width: 24px; height: 24px; font-size: 5.5px; }
+.gh .avatar.a20 { width: 20px; height: 20px; font-size: 4.5px; }
+.gh .avatar.a16 { width: 16px; height: 16px; font-size: 3.6px; }
+
+.gh .input {
+  display: flex; align-items: center; height: 32px; padding: 0 12px;
+  background: var(--gh-bg); border: 1px solid var(--gh-border); border-radius: 6px;
+  color: var(--gh-fg); font: inherit; font-size: 14px; width: 100%;
+}
+.gh input.input { outline: none; caret-color: var(--gh-fg); }
+.gh .input.ph { color: #6e7681; }
+.gh .input.focus { border-color: var(--gh-accent); box-shadow: inset 0 0 0 1px var(--gh-accent); }
+
+/* ---------- Cabecera global ---------- */
+.gh-header { flex: none; background: var(--gh-inset); border-bottom: 1px solid var(--gh-border); }
+.gh-hrow { display: flex; align-items: center; gap: 8px; height: 64px; padding: 0 16px; }
+.gh-logo { width: 32px; height: 32px; border-radius: 50%; background: #f0f6fc; display: grid; place-items: center; margin: 0 8px 0 6px; }
+.gh .gh-logo svg.oc { width: 18px; height: 18px; fill: #010409; }
+.gh-context { display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600; white-space: nowrap; }
+.gh-context .owner { font-weight: 400; }
+.gh-context .slash { color: var(--gh-fg-muted); font-weight: 400; }
+.gh-context .oc { color: var(--gh-fg-muted); }
+.gh-hright { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+.gh-ib { display: inline-flex; align-items: center; justify-content: center; gap: 2px; height: 32px; min-width: 32px; padding: 0 7px; border: 1px solid var(--gh-border); border-radius: 6px; color: var(--gh-fg-muted); background: transparent; cursor: pointer; }
+.gh-ib:hover { background: var(--gh-btn-hover); }
+.gh-ib.join-l { border-radius: 6px 0 0 6px; }
+.gh-ib.join-r { border-radius: 0 6px 6px 0; margin-left: -9px; min-width: 24px; padding: 0 4px; }
+.gh-ib.open { background: var(--gh-btn-hover); }
+.gh-ib .oc.caret { width: 12px; height: 12px; }
+
+.gh-tabs { display: flex; align-items: flex-end; gap: 4px; height: 48px; padding: 0 16px; overflow: hidden; }
+.gh-tab { position: relative; display: flex; align-items: center; gap: 8px; height: 48px; padding: 0 8px; color: var(--gh-fg); white-space: nowrap; cursor: pointer; }
+.gh-tab .oc { color: var(--gh-fg-muted); }
+.gh-tab span { padding: 4px 0; border-radius: 6px; }
+.gh-tab:hover span { background: transparent; }
+.gh-tab.sel { font-weight: 600; }
+.gh-tab.sel::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; border-radius: 6px; background: var(--gh-tab); }
+.gh-tab.more { margin-left: 4px; padding-left: 12px; border-left: 1px solid var(--gh-border); height: 24px; align-self: center; }
+
+/* ---------- Área de contenido con desplazamiento ---------- */
+.gh-scroll { flex: 1; min-height: 0; overflow: hidden; position: relative; }
+.gh-scroll-inner { position: relative; }
+
+/* ---------- Menús desplegables ---------- */
+.gh-menu {
+  position: absolute; z-index: 20; display: none;
+  background: var(--gh-muted-bg); border: 1px solid var(--gh-border); border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(1,4,9,.75); padding: 8px 0;
+  animation: ghPop .14s ease-out;
+}
+@keyframes ghPop { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+.gh-mi { display: flex; align-items: center; gap: 8px; margin: 0 8px; padding: 6px 8px; border-radius: 6px; cursor: pointer; white-space: nowrap; }
+.gh-mi .oc { color: var(--gh-fg-muted); }
+.gh-mi:hover { background: var(--gh-btn-hover); }
+.gh.menu-crear #gh-plus-menu { display: block; }
+.gh.menu-crear #gh-plus { background: var(--gh-btn-hover); }
+.gh-mdiv { height: 1px; background: var(--gh-border); margin: 8px 0; }
+
+/* ======================= Vista: inicio (Dashboard) ======================= */
+.v-inicio .gh-body { flex: 1; min-height: 0; display: flex; }
+.gh-side { width: 320px; flex: none; background: var(--gh-inset); border-right: 1px solid var(--gh-border); padding: 16px; }
+.gh-nav-item { position: relative; display: flex; align-items: center; gap: 8px; height: 32px; padding: 0 8px; border-radius: 6px; cursor: pointer; }
+.gh-nav-item .oc { color: var(--gh-fg-muted); }
+.gh-nav-item:hover { background: var(--gh-btn-hover); }
+.gh-nav-item.sel { background: var(--gh-btn-hover); font-weight: 600; }
+.gh-nav-item.sel::before { content: ""; position: absolute; left: -8px; top: 6px; bottom: 6px; width: 4px; border-radius: 6px; background: var(--gh-accent); }
+.gh-side hr { border: 0; border-top: 1px solid var(--gh-border); margin: 16px 0; }
+.gh-side-h { display: flex; align-items: center; justify-content: space-between; font-size: 12px; font-weight: 600; color: var(--gh-fg-muted); padding: 0 8px; margin-bottom: 8px; }
+.gh-repo-link { display: flex; align-items: center; gap: 8px; height: 32px; padding: 0 8px; border-radius: 6px; font-weight: 500; cursor: pointer; }
+.gh-repo-link:hover { background: var(--gh-btn-hover); }
+
+.gh-dash { flex: 1; min-width: 0; padding: 24px 24px; }
+.gh-dash-col { max-width: 512px; margin: 0 auto; }
+.gh-preview { display: flex; justify-content: flex-end; align-items: center; gap: 4px; }
+.gh-preview .label { color: var(--gh-success); border-color: #238636; }
+.gh-greet { display: flex; align-items: center; gap: 10px; font-size: 24px; font-weight: 600; margin: 8px 0 14px; }
+.gh-greet .oc { width: 28px; height: 28px; color: var(--gh-fg-muted); }
+.gh-chat { border: 1px solid var(--gh-border); border-radius: 12px; background: var(--gh-muted-bg); padding: 12px; }
+.gh-chat .ph { color: #6e7681; font-size: 15px; height: 56px; padding: 2px 4px; }
+.gh-chat-bar { display: flex; align-items: center; gap: 6px; }
+.gh-chat-bar .end { margin-left: auto; display: flex; gap: 6px; color: var(--gh-fg-muted); }
+.gh-chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 14px 0 22px; }
+.gh-chips .btn { border-radius: 8px; height: 36px; font-weight: 400; }
+.gh-sec-h { display: flex; align-items: center; justify-content: space-between; font-weight: 600; color: var(--gh-fg-muted); margin-bottom: 8px; }
+.gh-empty-box { border: 1px solid var(--gh-border); border-radius: 12px; padding: 14px 16px; color: var(--gh-fg-muted); background: var(--gh-muted-bg); }
+
+/* ======================= Vista: nuevo repositorio ======================= */
+.gh-form { max-width: 708px; margin: 0 auto; padding: 24px 0 40px 0; }
+.gh-form h1 { font-size: 20px; font-weight: 600; margin: 0 0 4px; }
+.gh-form .lead { color: var(--gh-fg-muted); margin: 0; }
+.gh-form .req-note { color: var(--gh-fg-muted); font-style: italic; margin: 0 0 20px; }
+.gh-req { color: #f85149; }
+.gh-step { position: relative; padding-left: 40px; padding-bottom: 20px; }
+.gh-step::before { content: ""; position: absolute; left: 13px; top: 30px; bottom: 0; width: 2px; background: var(--gh-border-muted); }
+.gh-step-n { position: absolute; left: 0; top: 0; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: #212830; color: var(--gh-fg-muted); font-size: 13px; }
+.gh-step h2 { font-size: 16px; font-weight: 600; margin: 2px 0 14px; }
+.gh-field-row { display: flex; align-items: flex-end; gap: 10px; }
+.gh-field label { display: block; font-weight: 600; margin-bottom: 6px; }
+.gh-field .note { color: var(--gh-fg-muted); font-size: 12px; margin-top: 4px; }
+.gh-owner .btn { gap: 8px; }
+.gh-slash { font-size: 20px; color: var(--gh-fg-muted); padding-bottom: 2px; }
+.gh-avail { display: none; align-items: center; gap: 6px; color: var(--gh-success); font-size: 12px; font-weight: 600; margin-top: 6px; }
+.gh.con-nombre .gh-avail { display: flex; }
+.gh.con-nombre .gh-suggest { display: none; }
+.gh-suggest { color: var(--gh-fg-muted); margin: 14px 0 18px; }
+.gh-suggest b { color: var(--gh-success); font-weight: 600; text-decoration: underline; }
+.gh-box { border: 1px solid var(--gh-border); border-radius: 6px; }
+.gh-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 16px; border-bottom: 1px solid var(--gh-border); }
+.gh-row:last-child { border-bottom: 0; }
+.gh-row .t { font-weight: 600; }
+.gh-row .d { color: var(--gh-fg-muted); font-size: 12px; }
+.gh-toggle { display: flex; align-items: center; gap: 8px; color: var(--gh-fg-muted); font-size: 12px; font-weight: 600; }
+.gh-toggle i { width: 40px; height: 22px; border-radius: 11px; background: var(--gh-btn); border: 1px solid var(--gh-border); position: relative; }
+.gh-toggle i::after { content: ""; position: absolute; left: 2px; top: 2px; width: 16px; height: 16px; border-radius: 50%; background: var(--gh-fg-muted); }
+.gh-create-row { display: flex; justify-content: flex-end; padding: 8px 0 0 40px; }
+.gh .vis-public { display: inline-flex; }
+.gh .vis-private { display: none; }
+.gh.privado .vis-public { display: none; }
+.gh.privado .vis-private { display: inline-flex; }
+.gh-vis-wrap { position: relative; }
+.gh.menu-vis #gh-vis-menu { display: block; }
+.gh.menu-vis #gh-vis { border-color: var(--gh-accent); }
+#gh-vis-menu { right: 0; top: 38px; width: 320px; }
+#gh-vis-menu .gh-mi { align-items: flex-start; white-space: normal; }
+#gh-vis-menu .gh-mi .ck { width: 16px; flex: none; margin-top: 2px; color: var(--gh-fg); }
+#gh-vis-menu .d { font-size: 12px; color: var(--gh-fg-muted); }
+
+/* ======================= Vistas de repositorio ======================= */
+.gh-repo-head { display: flex; align-items: center; gap: 8px; padding: 16px 16px 16px; margin: 0 16px; border-bottom: 1px solid var(--gh-border); }
+.gh-repo-head .name { font-size: 20px; font-weight: 600; }
+.gh-repo-head .acts { margin-left: auto; display: flex; gap: 8px; }
+.gh-repo-head .acts .btn { height: 28px; font-size: 12px; padding: 0 10px; }
+.gh-repo-head .acts .btn .counter { height: 16px; min-width: 16px; font-size: 11px; padding: 0 5px; }
+.gh-split { display: inline-flex; }
+.gh-split .btn:first-child { border-radius: 6px 0 0 6px; }
+.gh-split .btn + .btn { border-radius: 0 6px 6px 0; margin-left: -1px; padding: 0 6px; }
+
+.gh-page { padding: 16px 16px 32px; }
+
+/* Repositorio vacío: Quick setup */
+.gh-quick { border: 1px solid #1f3a5f; background: #0f1b2d; border-radius: 6px; padding: 16px; }
+.gh-quick-row { display: flex; align-items: center; gap: 8px; margin: 12px 0; }
+.gh-seg { display: inline-flex; border: 1px solid var(--gh-border); border-radius: 6px; overflow: hidden; }
+.gh-seg span { padding: 0 12px; height: 28px; display: grid; place-items: center; background: var(--gh-btn); font-size: 12px; font-weight: 600; border-left: 1px solid var(--gh-border); }
+.gh-seg span:first-child { border-left: 0; }
+.gh-seg span.on { background: #2f3742; }
+.gh-url { flex: 1; height: 28px; font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; font-size: 12px; }
+.gh-h3 { font-size: 16px; font-weight: 600; margin: 28px 0 10px; }
+.gh-code { background: var(--gh-muted-bg); border: 1px solid var(--gh-border); border-radius: 6px; padding: 14px 16px; font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; font-size: 12px; line-height: 1.8; color: #d1d7e0; white-space: pre; }
+
+/* Subir archivos */
+.gh-path { font-size: 20px; margin: 4px 0 16px; }
+.gh-drop { height: 200px; border: 1px solid var(--gh-border); border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; text-align: center; transition: height .25s; }
+.gh-drop .ico { width: 40px; height: 40px; color: var(--gh-fg-muted); }
+.gh-drop .ico svg.oc { width: 32px; height: 32px; }
+.gh-drop .tt { font-size: 18px; font-weight: 600; }
+.gh-drop .more { display: none; }
+.gh-up-list { display: none; border: 1px solid var(--gh-border); border-radius: 6px; margin-top: 8px; overflow: hidden; }
+.gh-up { display: flex; align-items: center; gap: 8px; height: 30px; padding: 0 12px; border-bottom: 1px solid var(--gh-border-muted); font-size: 13px; }
+.gh-up:last-child { border-bottom: 0; }
+.gh-up .oc { color: var(--gh-fg-muted); }
+.gh-up .nm { flex: 1; }
+.gh-up .bar { width: 160px; height: 6px; border-radius: 3px; background: #262c36; overflow: hidden; }
+.gh-up .bar i { display: block; height: 100%; width: 0; background: #2ea043; }
+.gh-up .x { color: var(--gh-fg-muted); }
+.gh.archivos .gh-drop { height: 72px; flex-direction: row; gap: 12px; }
+.gh.archivos .gh-drop .ico, .gh.archivos .gh-drop .ico svg.oc { width: 20px; height: 20px; }
+.gh.archivos .gh-drop .tt { font-size: 14px; }
+.gh.archivos .gh-drop .first { display: none; }
+.gh.archivos .gh-drop .more { display: inline; }
+.gh.archivos .gh-up-list { display: block; }
+.gh.archivos .gh-up .bar i { animation: ghUp .9s ease-out forwards; }
+.gh.archivos .gh-up:nth-child(2) .bar i { animation-delay: .12s; }
+.gh.archivos .gh-up:nth-child(3) .bar i { animation-delay: .24s; }
+.gh.archivos .gh-up:nth-child(4) .bar i { animation-delay: .36s; }
+.gh.archivos .gh-up:nth-child(5) .bar i { animation-delay: .48s; }
+@keyframes ghUp { to { width: 100%; } }
+.gh-commit-area { display: flex; gap: 12px; margin-top: 18px; }
+.gh-commit-box { flex: 1; border: 1px solid var(--gh-border); border-radius: 6px; padding: 12px 16px; }
+.gh-commit-box h3 { font-size: 16px; font-weight: 600; margin: 0 0 10px; }
+.gh-commit-box .input + .input { margin-top: 8px; }
+.gh-commit-box .ta { height: 64px; align-items: flex-start; padding-top: 6px; }
+.gh-radio { display: flex; align-items: center; gap: 8px; margin-top: 12px; }
+.gh-radio i { width: 16px; height: 16px; border-radius: 50%; border: 5px solid var(--gh-accent); background: var(--gh-bg); flex: none; }
+.gh-radio i.off { border: 1px solid var(--gh-border); }
+.gh-chip { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; background: rgba(56,139,253,.15); color: var(--gh-accent); padding: 1px 6px; border-radius: 6px; }
+.gh-commit-btns { display: flex; gap: 8px; margin: 14px 0 0 44px; }
+
+/* Repositorio con archivos */
+.gh-repo-grid { display: flex; gap: 24px; }
+.gh-repo-main { flex: 1; min-width: 0; }
+.gh-repo-side { width: 296px; flex: none; }
+.gh-toolbar { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+.gh-toolbar .right { margin-left: auto; display: flex; gap: 8px; position: relative; }
+.gh-files { border: 1px solid var(--gh-border); border-radius: 6px; overflow: hidden; }
+.gh-files-head { display: flex; align-items: center; gap: 8px; padding: 0 16px; height: 50px; background: var(--gh-muted-bg); border-bottom: 1px solid var(--gh-border); font-size: 13px; }
+.gh-files-head .msg { color: var(--gh-fg-muted); }
+.gh-files-head .meta { margin-left: auto; display: flex; align-items: center; gap: 8px; color: var(--gh-fg-muted); font-size: 12px; }
+.gh-frow { display: flex; align-items: center; gap: 10px; height: 40px; padding: 0 16px; border-bottom: 1px solid var(--gh-border-muted); font-size: 14px; }
+.gh-frow:last-child { border-bottom: 0; }
+.gh-frow:hover { background: var(--gh-muted-bg); }
+.gh-frow .ic { color: var(--gh-fg-muted); display: inline-flex; }
+.gh-frow .ic.dir { color: #9198a1; }
+.gh-frow .nm { width: 38%; display: inline-flex; align-items: center; gap: 10px; }
+.gh-frow .nm b { font-weight: 400; cursor: pointer; }
+.gh-frow .nm b:hover { color: var(--gh-accent); text-decoration: underline; }
+.gh-frow .cm { flex: 1; color: var(--gh-fg-muted); }
+.gh-frow .dt { color: var(--gh-fg-muted); font-size: 13px; }
+.gh-readme { border: 1px solid var(--gh-border); border-radius: 6px; margin-top: 16px; }
+.gh-readme-tabs { display: flex; align-items: center; height: 48px; padding: 0 8px; border-bottom: 1px solid var(--gh-border); }
+.gh-readme-tabs .t { position: relative; display: flex; align-items: center; gap: 8px; height: 48px; padding: 0 8px; font-weight: 600; font-size: 13px; }
+.gh-readme-tabs .t::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--gh-tab); border-radius: 6px; }
+.gh-md { padding: 24px 32px; }
+.gh-md h1 { font-size: 28px; font-weight: 600; margin: 0 0 16px; padding-bottom: 8px; border-bottom: 1px solid var(--gh-border-muted); }
+.gh-md h2 { font-size: 21px; font-weight: 600; margin: 22px 0 12px; padding-bottom: 6px; border-bottom: 1px solid var(--gh-border-muted); }
+.gh-md p { margin: 0 0 14px; }
+.gh-md ul { margin: 0; padding-left: 28px; }
+.gh-md li { margin: 4px 0; }
+.gh-md code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 85%; background: rgba(101,108,118,.2); padding: 2px 6px; border-radius: 6px; }
+
+.gh-about h2 { display: flex; justify-content: space-between; align-items: center; font-size: 16px; font-weight: 600; margin: 0 0 14px; }
+.gh-about h2 .oc { color: var(--gh-fg-muted); }
+.gh-about p { color: var(--gh-fg-muted); font-style: italic; margin: 0 0 14px; }
+.gh-about .st { display: flex; align-items: center; gap: 8px; color: var(--gh-fg-muted); margin: 6px 0; }
+.gh-about .st b { color: var(--gh-fg); font-weight: 600; }
+.gh-about hr { border: 0; border-top: 1px solid var(--gh-border); margin: 20px 0; }
+.gh-about .small { font-size: 12px; color: var(--gh-fg-muted); margin: 0 0 4px; font-style: normal; }
+
+/* Menú del botón Code */
+.gh.menu-code #gh-code-menu { display: block; }
+.gh.menu-code #gh-code-btn { background: var(--gh-green-hover); }
+#gh-code-menu { right: 0; top: 40px; width: 400px; padding: 0; }
+.gh-cm-tabs { display: flex; gap: 4px; padding: 0 8px; border-bottom: 1px solid var(--gh-border); }
+.gh-cm-tabs span { position: relative; padding: 12px 8px; font-weight: 600; font-size: 14px; }
+.gh-cm-tabs span.on::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--gh-tab); border-radius: 6px; }
+.gh-cm-body { padding: 16px; }
+.gh-cm-title { display: flex; align-items: center; gap: 8px; font-weight: 600; margin-bottom: 10px; }
+.gh-cm-title .q { margin-left: auto; color: var(--gh-fg-muted); }
+.gh-cm-url { display: flex; gap: 8px; align-items: center; margin: 12px 0 8px; position: relative; }
+.gh-cm-url .input { height: 32px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; background: var(--gh-inset); }
+.gh-cm-note { color: var(--gh-fg-muted); font-size: 12px; }
+.gh-cm-list { border-top: 1px solid var(--gh-border); padding: 8px 0; }
+.gh-copied { display: none; position: absolute; right: -6px; top: -34px; background: #3d444d; color: #fff; font-size: 12px; padding: 4px 8px; border-radius: 6px; white-space: nowrap; }
+.gh.copiado .gh-copied { display: block; }
+.gh.copiado #gh-copy .oc { color: var(--gh-success); }
+
+/* Vista de archivo (README.md) */
+.gh-fv-top { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+.gh-crumbs { display: flex; align-items: center; gap: 6px; font-size: 16px; }
+.gh-crumbs .cur { font-weight: 600; }
+.gh-crumbs .oc { color: var(--gh-fg-muted); }
+.gh-fv-top .right { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+.gh-goto { width: 220px; height: 32px; display: flex; align-items: center; gap: 8px; padding: 0 8px; border: 1px solid var(--gh-border); border-radius: 6px; color: #6e7681; }
+.gh-goto kbd { margin-left: auto; font: 11px ui-monospace, monospace; color: var(--gh-fg-muted); border: 1px solid var(--gh-border); border-radius: 6px; padding: 0 5px; }
+.gh-fv-box { border: 1px solid var(--gh-border); border-radius: 6px; margin-top: 16px; overflow: hidden; }
+.gh-fv-bar { display: flex; align-items: center; gap: 12px; height: 50px; padding: 0 8px; background: var(--gh-muted-bg); border-bottom: 1px solid var(--gh-border); }
+.gh-fv-bar .seg { display: inline-flex; border: 1px solid var(--gh-border); border-radius: 6px; overflow: hidden; background: var(--gh-inset); }
+.gh-fv-bar .seg span { padding: 4px 12px; font-size: 13px; }
+.gh-fv-bar .seg span.on { background: var(--gh-btn); border: 1px solid var(--gh-border); border-radius: 6px; margin: -1px; font-weight: 600; }
+.gh-fv-bar .meta { color: var(--gh-fg-muted); font-size: 12px; }
+.gh-fv-bar .right { margin-left: auto; display: flex; gap: 6px; }
+
+/* ---------- Versión estrecha (pantallas pequeñas) ---------- */
+@container gh (max-width: 900px) {
+  .gh-side { width: 240px; }
+  .gh-repo-side { display: none; }
+  .gh .hide-sm { display: none !important; }
+  .gh-frow .cm { display: none; }
+  .gh-frow .nm { flex: 1; width: auto; }
+  .gh-goto { display: none; }
+}

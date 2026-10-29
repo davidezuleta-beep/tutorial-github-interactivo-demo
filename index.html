@@ -1,0 +1,453 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>GitHub en 3 acciones · Simulador Biniac</title>
+  <meta name="description" content="Simulador de práctica de Biniac: aprende a crear un repositorio privado, subir archivos y copiar la URL en una réplica de la interfaz de GitHub.">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="github.css">
+</head>
+<body>
+  <header class="top">
+    <div class="brand"><span class="dot"></span>biniac</div>
+    <div class="progress" aria-label="Progreso">
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      <span class="progress-label" id="progressLabel">0 de 0</span>
+    </div>
+  </header>
+
+  <main>
+    <!-- Bienvenida -->
+    <section class="screen intro" id="intro">
+      <p class="eyebrow">Simulador de práctica</p>
+      <h1 id="introTitle"></h1>
+      <p class="lead" id="introText"></p>
+      <ol class="intro-list" id="introList"></ol>
+      <div class="intro-actions">
+        <button class="btn primary" id="startDemoBtn" type="button">▶ Ver la demo</button>
+        <button class="btn ghost" id="startPracticeBtn" type="button">Practicar paso a paso</button>
+      </div>
+    </section>
+
+    <!-- Simulador -->
+    <section class="screen player" id="player" hidden>
+      <nav class="modules" id="modules" aria-label="Módulos"></nav>
+
+      <div class="stage-wrap" id="stageWrap">
+        <div class="browser" aria-hidden="true">
+          <span class="dots"><i></i><i></i><i></i></span>
+          <span class="browser-label">Simulación de GitHub · práctica sin conexión</span>
+        </div>
+        <div class="stage" id="stage">
+          <div class="canvas" id="canvas"></div>
+          <div class="spot" id="spot" aria-hidden="true"></div>
+          <button class="hit" id="hit" type="button"></button>
+          <div class="cursor" id="cursor" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="26" height="26"><path d="M4 2.5 L4 19.5 L8.6 15.3 L11.6 22 L14.6 20.7 L11.7 14.1 L18 14.1 Z" fill="#fff" stroke="#1F1F26" stroke-width="1.6" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="toast" id="toast" hidden></div>
+        </div>
+        <div class="tip" id="tip" role="status" aria-live="polite">
+          <div class="tip-meta" id="tipMeta"></div>
+          <p class="tip-text" id="tipText"></p>
+          <p class="tip-hint" id="tipHint" hidden></p>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button class="btn ghost" id="backBtn" type="button">← Atrás</button>
+        <button class="btn ghost" id="repeatBtn" type="button">↻ Repetir paso</button>
+        <button class="btn ghost mode" id="playBtn" type="button">⏸ Pausar demo</button>
+        <button class="btn ghost mode" id="practiceBtn" type="button">✋ Practicar yo</button>
+        <button class="btn ghost" id="restartBtn" type="button">Reiniciar</button>
+      </div>
+      <p class="sim-note" id="simNote"></p>
+    </section>
+
+    <!-- Final -->
+    <section class="screen done" id="done" hidden>
+      <div class="done-mark">✓</div>
+      <h1 id="doneTitle"></h1>
+      <p class="lead" id="doneText"></p>
+      <ol class="intro-list" id="doneList"></ol>
+      <div class="intro-actions">
+        <button class="btn primary" id="againPracticeBtn" type="button">Practicar paso a paso</button>
+        <button class="btn ghost" id="againDemoBtn" type="button">▶ Ver la demo otra vez</button>
+      </div>
+    </section>
+
+    <aside class="editor" id="editor" hidden>
+      <strong>Modo edición</strong>
+      <span>Pasa el cursor sobre un elemento para ver su selector. Flechas ← → para cambiar de paso.</span>
+      <code id="editorOut">—</code>
+    </aside>
+
+    <p class="credit">Simulador educativo de Biniac. No es GitHub ni está afiliado a GitHub, Inc. Íconos: Primer Octicons (MIT).</p>
+  </main>
+
+  <!-- =====================================================================
+       RÉPLICA DE LA INTERFAZ DE GITHUB
+       Cada <template id="vista-…"> es una pantalla. Los pasos (pasos.js)
+       indican qué vista mostrar, en qué estado y qué elemento hay que pulsar.
+       <i data-ic="nombre"> inserta un ícono; <div data-parcial="…"> inserta
+       una pieza reutilizable (las cabeceras).
+       ===================================================================== -->
+
+  <!-- Piezas reutilizables -->
+  <template id="parcial-acciones">
+    <div class="gh-hright">
+      <span class="gh-ib"><i data-ic="search"></i></span>
+      <span class="gh-ib join-l"><i data-ic="copilot"></i></span><span class="gh-ib join-r"><i data-ic="triangle-down" class="caret"></i></span>
+      <span class="sep"></span>
+      <span class="gh-ib" id="gh-plus"><i data-ic="plus"></i><i data-ic="triangle-down" class="caret"></i></span>
+      <span class="gh-ib hide-sm"><i data-ic="issue-opened"></i></span>
+      <span class="gh-ib hide-sm"><i data-ic="git-pull-request"></i></span>
+      <span class="gh-ib hide-sm"><i data-ic="repo"></i></span>
+      <span class="gh-ib"><i data-ic="inbox"></i></span>
+      <span class="avatar a32">biniac</span>
+    </div>
+  </template>
+
+  <template id="parcial-cab-repo">
+    <div class="gh-header">
+      <div class="gh-hrow">
+        <span class="gh-ib"><i data-ic="three-bars"></i></span>
+        <span class="gh-logo"><i data-ic="git-branch"></i></span>
+        <span class="gh-context"><span class="owner">Biniac</span><span class="slash">/</span><span>mi-proyecto</span><i data-ic="triangle-down"></i></span>
+        <div data-parcial="acciones"></div>
+      </div>
+      <nav class="gh-tabs">
+        <span class="gh-tab sel" id="gh-tab-code"><i data-ic="code"></i><span>Code</span></span>
+        <span class="gh-tab"><i data-ic="issue-opened"></i><span>Issues</span></span>
+        <span class="gh-tab"><i data-ic="git-pull-request"></i><span>Pull requests</span></span>
+        <span class="gh-tab"><i data-ic="play"></i><span>Actions</span></span>
+        <span class="gh-tab hide-sm"><i data-ic="table"></i><span>Projects</span></span>
+        <span class="gh-tab hide-sm"><i data-ic="shield"></i><span>Security and quality</span></span>
+        <span class="gh-tab hide-sm"><i data-ic="graph"></i><span>Insights</span></span>
+        <span class="gh-tab more"><span>More</span><i data-ic="triangle-down"></i></span>
+      </nav>
+    </div>
+  </template>
+
+  <template id="parcial-titulo-repo">
+    <div class="gh-repo-head">
+      <span class="avatar a24">biniac</span>
+      <span class="name">mi-proyecto</span>
+      <span class="label">Private</span>
+      <div class="acts">
+        <span class="btn"><i data-ic="pin"></i>Pin</span>
+        <span class="gh-split"><span class="btn"><i data-ic="eye"></i>Watch <span class="counter">0</span></span><span class="btn"><i data-ic="triangle-down"></i></span></span>
+        <span class="gh-split hide-sm"><span class="btn"><i data-ic="repo-forked"></i>Fork <span class="counter">0</span></span><span class="btn"><i data-ic="triangle-down"></i></span></span>
+        <span class="gh-split"><span class="btn"><i data-ic="star"></i>Star <span class="counter">0</span></span><span class="btn"><i data-ic="triangle-down"></i></span></span>
+      </div>
+    </div>
+  </template>
+
+  <!-- Vista: inicio (Dashboard) -->
+  <template id="vista-inicio">
+    <div class="gh v-inicio">
+      <div class="gh-header">
+        <div class="gh-hrow">
+          <span class="gh-ib"><i data-ic="three-bars"></i></span>
+          <span class="gh-logo"><i data-ic="git-branch"></i></span>
+          <span class="gh-context">Dashboard</span>
+          <div data-parcial="acciones"></div>
+        </div>
+      </div>
+      <div class="gh-menu" id="gh-plus-menu" style="right:64px;top:56px;width:200px">
+        <div class="gh-mi"><i data-ic="issue-opened"></i>New issue</div>
+        <div class="gh-mi" id="gh-new-repo"><i data-ic="repo"></i>New repository</div>
+        <div class="gh-mi"><i data-ic="upload"></i>Import repository</div>
+        <div class="gh-mdiv"></div>
+        <div class="gh-mi"><i data-ic="codespaces"></i>New codespace</div>
+        <div class="gh-mi"><i data-ic="code"></i>New gist</div>
+        <div class="gh-mdiv"></div>
+        <div class="gh-mi"><i data-ic="organization"></i>New organization</div>
+        <div class="gh-mi"><i data-ic="project"></i>New project</div>
+      </div>
+      <div class="gh-body">
+        <aside class="gh-side">
+          <div class="gh-nav-item sel"><i data-ic="home"></i>Home</div>
+          <div class="gh-nav-item"><i data-ic="globe"></i>Feed</div>
+          <hr>
+          <div class="gh-side-h">Top repositories <i data-ic="search"></i></div>
+          <div class="gh-repo-link"><span class="avatar a16">biniac</span>Biniac/landing-page</div>
+          <div class="gh-repo-link"><span class="avatar a16">biniac</span>Biniac/presentaciones</div>
+          <div class="gh-repo-link"><span class="avatar a16">biniac</span>Biniac/recursos</div>
+        </aside>
+        <section class="gh-dash">
+          <div class="gh-dash-col">
+            <div class="gh-preview"><span class="label">Preview</span><i data-ic="triangle-down" class="muted"></i></div>
+            <div class="gh-greet"><i data-ic="copilot"></i>Good morning, Biniac!</div>
+            <div class="gh-chat">
+              <div class="ph">Ask anything or type @ to add context</div>
+              <div class="gh-chat-bar">
+                <span class="btn sm"><i data-ic="comment-discussion"></i>Ask <i data-ic="triangle-down"></i></span>
+                <span class="btn sm"><i data-ic="repo"></i>All repositories <i data-ic="triangle-down"></i></span>
+                <span class="btn sm icon"><i data-ic="plus"></i></span>
+                <span class="end"><i data-ic="goal"></i><i data-ic="paper-airplane"></i></span>
+              </div>
+            </div>
+            <div class="gh-chips">
+              <span class="btn"><i data-ic="bug"></i>Debug</span>
+              <span class="btn"><i data-ic="cloud"></i>Agent</span>
+              <span class="btn"><i data-ic="issue-draft"></i>Create issue</span>
+              <span class="btn"><i data-ic="file-code"></i>Write code <i data-ic="triangle-down"></i></span>
+              <span class="btn"><i data-ic="git-branch"></i>Git <i data-ic="triangle-down"></i></span>
+            </div>
+            <div class="gh-sec-h"><span>Pull requests</span><span class="link" style="font-weight:400">View all <i data-ic="filter" class="muted"></i></span></div>
+            <div class="gh-empty-box">No pull requests found, try a different filter.</div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </template>
+
+  <!-- Vista: nuevo repositorio -->
+  <template id="vista-nuevo">
+    <div class="gh v-nuevo">
+      <div class="gh-header">
+        <div class="gh-hrow">
+          <span class="gh-ib"><i data-ic="three-bars"></i></span>
+          <span class="gh-logo"><i data-ic="git-branch"></i></span>
+          <span class="gh-context">New repository</span>
+          <div data-parcial="acciones"></div>
+        </div>
+      </div>
+      <div class="gh-scroll"><div class="gh-scroll-inner">
+        <div class="gh-form">
+          <h1>Create a new repository</h1>
+          <p class="lead">Repositories contain a project's files and version history. Have a project elsewhere? <span class="link">Import a repository</span>.</p>
+          <p class="req-note">Required fields are marked with an asterisk (*).</p>
+
+          <div class="gh-step">
+            <span class="gh-step-n">1</span>
+            <h2>General</h2>
+            <div class="gh-field-row">
+              <div class="gh-field gh-owner"><label>Owner <span class="gh-req">*</span></label><span class="btn"><span class="avatar a20">biniac</span>Biniac<i data-ic="triangle-down"></i></span></div>
+              <span class="gh-slash">/</span>
+              <div class="gh-field" style="flex:1"><label>Repository name <span class="gh-req">*</span></label><input class="input" id="gh-name" readonly tabindex="-1" aria-label="Repository name"></div>
+            </div>
+            <div class="gh-avail"><i data-ic="check"></i><span>mi-proyecto is available.</span></div>
+            <p class="gh-suggest">Great repository names are short and memorable. How about <b>probable-disco</b>?</p>
+            <div class="gh-field" style="margin-top:16px"><label>Description</label><div class="input"></div><div class="note">0 / 350 characters</div></div>
+          </div>
+
+          <div class="gh-step">
+            <span class="gh-step-n">2</span>
+            <h2>Configuration</h2>
+            <div class="gh-box">
+              <div class="gh-row">
+                <div><div class="t">Choose visibility <span class="gh-req">*</span></div><div class="d">Choose who can see and commit to this repository</div></div>
+                <div class="gh-vis-wrap">
+                  <span class="btn" id="gh-vis"><span class="vis-public" style="gap:6px;align-items:center"><i data-ic="repo"></i> Public</span><span class="vis-private" style="gap:6px;align-items:center"><i data-ic="lock"></i> Private</span><i data-ic="triangle-down"></i></span>
+                  <div class="gh-menu" id="gh-vis-menu">
+                    <div class="gh-mi"><span class="ck"><i data-ic="check"></i></span><div><div class="bold">Public</div><div class="d">Anyone on the internet can see this repository. You choose who can commit.</div></div></div>
+                    <div class="gh-mi" id="gh-opt-private"><span class="ck"></span><div><div class="bold">Private</div><div class="d">You choose who can see and commit to this repository.</div></div></div>
+                  </div>
+                </div>
+              </div>
+              <div class="gh-row">
+                <div><div class="t">Add README</div><div class="d">READMEs can be used as longer descriptions. <span class="link">About READMEs</span></div></div>
+                <div class="gh-toggle"><span>Off</span><i></i></div>
+              </div>
+              <div class="gh-row">
+                <div><div class="t">Add .gitignore</div><div class="d">.gitignore tells git which files not to track.</div></div>
+                <span class="btn">No .gitignore <i data-ic="triangle-down"></i></span>
+              </div>
+              <div class="gh-row">
+                <div><div class="t">Add license</div><div class="d">Licenses explain how others can use your code.</div></div>
+                <span class="btn">No license <i data-ic="triangle-down"></i></span>
+              </div>
+            </div>
+          </div>
+          <div class="gh-create-row"><span class="btn primary" id="gh-create">Create repository</span></div>
+        </div>
+      </div></div>
+    </div>
+  </template>
+
+  <!-- Vista: repositorio recién creado (vacío) -->
+  <template id="vista-vacio">
+    <div class="gh v-vacio">
+      <div data-parcial="cab-repo"></div>
+      <div class="gh-scroll"><div class="gh-scroll-inner">
+        <div data-parcial="titulo-repo"></div>
+        <div class="gh-page">
+          <div class="gh-quick">
+            <div class="bold">Quick setup — if you’ve done this kind of thing before</div>
+            <div class="gh-quick-row">
+              <span class="btn sm"><i data-ic="device-desktop"></i>Set up in Desktop</span>
+              <span class="muted">or</span>
+              <span class="gh-seg"><span class="on">HTTPS</span><span>SSH</span></span>
+              <span class="input gh-url">https://github.com/Biniac/mi-proyecto.git</span>
+              <span class="btn sm icon"><i data-ic="copy"></i></span>
+            </div>
+            <div>Get started by <span class="link">creating a new file</span> or <span class="link" id="gh-link-upload">uploading an existing file</span>. We recommend every repository include a <span class="link">README</span>, <span class="link">LICENSE</span>, and <span class="link">.gitignore</span>.</div>
+          </div>
+          <div class="gh-h3">…or create a new repository on the command line</div>
+          <div class="gh-code">echo "# mi-proyecto" &gt;&gt; README.md
+git init
+git add README.md
+git commit -m "first commit"
+git branch -M main
+git remote add origin https://github.com/Biniac/mi-proyecto.git
+git push -u origin main</div>
+        </div>
+      </div></div>
+    </div>
+  </template>
+
+  <!-- Vista: subir archivos -->
+  <template id="vista-subir">
+    <div class="gh v-subir">
+      <div data-parcial="cab-repo"></div>
+      <div class="gh-scroll"><div class="gh-scroll-inner">
+        <div class="gh-page">
+          <div class="gh-path"><span class="link">mi-proyecto</span> <span class="muted">/</span></div>
+          <div class="gh-drop">
+            <span class="ico"><i data-ic="file"></i></span>
+            <div class="tt"><span class="first">Drag files here to add them to your repository</span><span class="more">Drag additional files here to add them to your repository</span></div>
+            <div class="muted">Or <span class="link" id="gh-choose">choose your files</span></div>
+          </div>
+          <div class="gh-up-list">
+            <div class="gh-up"><i data-ic="file"></i><span class="nm">README.md</span><span class="bar"><i></i></span><i data-ic="x" class="x"></i></div>
+            <div class="gh-up"><i data-ic="file"></i><span class="nm">estilos.css</span><span class="bar"><i></i></span><i data-ic="x" class="x"></i></div>
+            <div class="gh-up"><i data-ic="file"></i><span class="nm">imagenes/portada.png</span><span class="bar"><i></i></span><i data-ic="x" class="x"></i></div>
+            <div class="gh-up"><i data-ic="file"></i><span class="nm">index.html</span><span class="bar"><i></i></span><i data-ic="x" class="x"></i></div>
+            <div class="gh-up"><i data-ic="file"></i><span class="nm">script.js</span><span class="bar"><i></i></span><i data-ic="x" class="x"></i></div>
+          </div>
+          <div class="gh-commit-area">
+            <span class="avatar a32">biniac</span>
+            <div class="gh-commit-box">
+              <h3>Commit changes</h3>
+              <div class="input ph">Add files via upload</div>
+              <div class="input ph ta">Add an optional extended description…</div>
+              <div class="gh-radio"><i></i><span>Commit directly to the <span class="gh-chip">main</span> branch.</span></div>
+              <div class="gh-radio"><i class="off"></i><span>Create a <b>new branch</b> for this commit and start a pull request.</span></div>
+            </div>
+          </div>
+          <div class="gh-commit-btns"><span class="btn primary" id="gh-commit">Commit changes</span><span class="btn">Cancel</span></div>
+        </div>
+      </div></div>
+    </div>
+  </template>
+
+  <!-- Vista: repositorio con archivos -->
+  <template id="vista-repo">
+    <div class="gh v-repo">
+      <div data-parcial="cab-repo"></div>
+      <div class="gh-scroll"><div class="gh-scroll-inner">
+        <div data-parcial="titulo-repo"></div>
+        <div class="gh-page">
+          <div class="gh-repo-grid">
+            <div class="gh-repo-main">
+              <div class="gh-toolbar">
+                <span class="btn"><i data-ic="git-branch"></i>main<i data-ic="triangle-down"></i></span>
+                <span class="btn ghost icon"><i data-ic="git-branch"></i></span>
+                <span class="btn ghost icon"><i data-ic="tag"></i></span>
+                <div class="right">
+                  <span class="btn">Go to file</span>
+                  <span class="btn icon"><i data-ic="plus"></i></span>
+                  <span class="btn primary" id="gh-code-btn"><i data-ic="code"></i>Code<i data-ic="triangle-down"></i></span>
+                  <div class="gh-menu" id="gh-code-menu">
+                    <div class="gh-cm-tabs"><span class="on">Local</span><span>Codespaces</span></div>
+                    <div class="gh-cm-body">
+                      <div class="gh-cm-title"><i data-ic="terminal"></i>Clone<span class="q"><i data-ic="question"></i></span></div>
+                      <span class="gh-seg"><span class="on">HTTPS</span><span>SSH</span><span>GitHub CLI</span></span>
+                      <div class="gh-cm-url">
+                        <span class="input">https://github.com/Biniac/mi-proyecto.git</span>
+                        <span class="btn icon ghost" id="gh-copy"><i data-ic="copy"></i></span>
+                        <span class="gh-copied">Copied!</span>
+                      </div>
+                      <div class="gh-cm-note">Clone using the web URL.</div>
+                    </div>
+                    <div class="gh-cm-list">
+                      <div class="gh-mi"><i data-ic="copilot"></i>Open in GitHub Copilot app</div>
+                      <div class="gh-mi"><i data-ic="desktop-download"></i>Open with GitHub Desktop</div>
+                      <div class="gh-mi"><i data-ic="file-zip"></i>Download ZIP</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="gh-files">
+                <div class="gh-files-head"><span class="avatar a20">biniac</span><b>Biniac</b><span class="msg">Add files via upload</span><span class="meta">a3f9c21 · now <i data-ic="history"></i> <b style="color:#f0f6fc">1</b> Commit</span></div>
+                <div class="gh-frow"><span class="nm"><span class="ic dir"><i data-ic="file-directory-fill"></i></span><b>imagenes</b></span><span class="cm">Add files via upload</span><span class="dt">now</span></div>
+                <div class="gh-frow"><span class="nm"><span class="ic"><i data-ic="file"></i></span><b id="gh-file-readme">README.md</b></span><span class="cm">Add files via upload</span><span class="dt">now</span></div>
+                <div class="gh-frow"><span class="nm"><span class="ic"><i data-ic="file"></i></span><b>estilos.css</b></span><span class="cm">Add files via upload</span><span class="dt">now</span></div>
+                <div class="gh-frow"><span class="nm"><span class="ic"><i data-ic="file"></i></span><b>index.html</b></span><span class="cm">Add files via upload</span><span class="dt">now</span></div>
+                <div class="gh-frow"><span class="nm"><span class="ic"><i data-ic="file"></i></span><b>script.js</b></span><span class="cm">Add files via upload</span><span class="dt">now</span></div>
+              </div>
+              <div class="gh-readme">
+                <div class="gh-readme-tabs"><span class="t"><i data-ic="book"></i>README</span></div>
+                <div class="gh-md" data-parcial="readme"></div>
+              </div>
+            </div>
+            <aside class="gh-repo-side gh-about">
+              <h2>About <i data-ic="gear"></i></h2>
+              <p>No description, website, or topics provided.</p>
+              <div class="st"><i data-ic="book"></i>Readme</div>
+              <div class="st"><i data-ic="pulse"></i>Activity</div>
+              <div class="st"><i data-ic="star"></i><b>0</b> stars</div>
+              <div class="st"><i data-ic="eye"></i><b>0</b> watching</div>
+              <div class="st"><i data-ic="repo-forked"></i><b>0</b> forks</div>
+              <hr>
+              <h2>Releases</h2>
+              <p class="small">No releases published</p>
+              <span class="link" style="font-size:12px">Create a new release</span>
+              <hr>
+              <h2>Packages</h2>
+              <p class="small">No packages published</p>
+              <span class="link" style="font-size:12px">Publish your first package</span>
+            </aside>
+          </div>
+        </div>
+      </div></div>
+    </div>
+  </template>
+
+  <!-- Vista: archivo README.md -->
+  <template id="vista-archivo">
+    <div class="gh v-archivo">
+      <div data-parcial="cab-repo"></div>
+      <div class="gh-scroll"><div class="gh-scroll-inner">
+        <div class="gh-page">
+          <div class="gh-fv-top">
+            <span class="btn icon ghost"><i data-ic="sidebar-collapse"></i></span>
+            <span class="btn"><i data-ic="git-branch"></i>main<i data-ic="triangle-down"></i></span>
+            <span class="gh-crumbs"><span class="link" id="gh-crumb-repo">mi-proyecto</span><span class="muted">/</span><span class="cur">README.md</span><i data-ic="copy"></i></span>
+            <div class="right"><span class="gh-goto"><i data-ic="search"></i>Go to file<kbd>t</kbd></span><span class="btn icon"><i data-ic="kebab-horizontal"></i></span></div>
+          </div>
+          <div class="gh-files"><div class="gh-files-head"><span class="avatar a20">biniac</span><b>Biniac</b><span class="msg">Add files via upload</span><span class="meta">a3f9c21 · now <i data-ic="history"></i> History</span></div></div>
+          <div class="gh-fv-box">
+            <div class="gh-fv-bar">
+              <span class="seg"><span class="on">Preview</span><span>Code</span><span>Blame</span></span>
+              <span class="meta">11 lines (8 loc) · 248 Bytes</span>
+              <span class="right"><span class="btn sm">Raw</span><span class="btn sm icon"><i data-ic="copy"></i></span><span class="btn sm icon"><i data-ic="download"></i></span><span class="btn sm icon"><i data-ic="pencil"></i></span><span class="btn sm icon"><i data-ic="list-unordered"></i></span></span>
+            </div>
+            <div class="gh-md" data-parcial="readme"></div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+  </template>
+
+  <template id="parcial-readme">
+    <h1>Mi proyecto</h1>
+    <p>Sitio web de ejemplo para practicar GitHub.</p>
+    <h2>Contenido</h2>
+    <ul>
+      <li><code>index.html</code>: página principal</li>
+      <li><code>estilos.css</code>: colores y tipografía</li>
+      <li><code>script.js</code>: interacciones</li>
+      <li><code>imagenes/</code>: recursos gráficos</li>
+    </ul>
+  </template>
+
+  <script src="iconos.js"></script>
+  <script src="pasos.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
