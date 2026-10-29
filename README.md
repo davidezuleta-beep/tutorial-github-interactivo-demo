@@ -59,6 +59,6 @@ Mantén los `id` que usa `pasos.js` o actualízalos allí.
 
 ## Publicación
 
-GitHub Pages publica la rama `main` desde la raíz. Cada cambio en `main` se publica en uno o dos minutos.
+Edita siempre la rama `main`. La acción `.github/workflows/publicar.yml` copia `main` en la rama `gh-pages`, que es la que publica GitHub Pages. Cada cambio aparece en el sitio en uno o dos minutos.
 
 Simulador educativo de Biniac. No es GitHub ni está afiliado a GitHub, Inc.
