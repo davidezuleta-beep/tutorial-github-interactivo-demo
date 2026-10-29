@@ -130,6 +130,7 @@
   function go(i) {
     clearFlow(); clearAuto();
     busy = false;
+    scrolling = false;
     idx = i;
     if (i < 0) { show("intro"); setProgress(0, "0 de " + total); return; }
     if (i >= total) {
@@ -221,15 +222,16 @@
     if (top >= sc.scrollTop + margin && top + h + extra <= sc.scrollTop + vh - margin) { done(); return; }
     var dest = Math.max(0, Math.min(top - (vh - h - extra) / 2, sc.scrollHeight - vh));
     if (!smooth) { sc.scrollTop = dest; done(); return; }
-    var from = sc.scrollTop, t0 = null, dur = 550;
+    // Animación con temporizador (no con requestAnimationFrame) para que
+    // termine siempre, incluso si la pestaña no está en primer plano.
+    var from = sc.scrollTop, t0 = Date.now(), dur = 550;
     scrolling = true;
-    (function step(ts) {
-      if (t0 === null) t0 = ts;
-      var k = Math.min((ts - t0) / dur, 1);
+    (function step() {
+      var k = Math.min((Date.now() - t0) / dur, 1);
       var e = k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
       sc.scrollTop = from + (dest - from) * e;
-      if (k < 1) requestAnimationFrame(step); else { scrolling = false; done(); }
-    })(performance.now());
+      if (k < 1) later(step, 16); else { scrolling = false; done(); }
+    })();
   }
 
   // ---------- geometría ----------
